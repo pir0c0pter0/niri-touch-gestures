@@ -6,6 +6,7 @@ pub struct Gestures {
     pub dnd_edge_view_scroll: DndEdgeViewScroll,
     pub dnd_edge_workspace_switch: DndEdgeWorkspaceSwitch,
     pub hot_corners: HotCorners,
+    pub touchscreen_swipe: TouchscreenSwipe,
 }
 
 #[derive(knuffel::Decode, Debug, Default, Clone, Copy, PartialEq)]
@@ -16,6 +17,8 @@ pub struct GesturesPart {
     pub dnd_edge_workspace_switch: Option<DndEdgeWorkspaceSwitchPart>,
     #[knuffel(child)]
     pub hot_corners: Option<HotCorners>,
+    #[knuffel(child)]
+    pub touchscreen_swipe: Option<TouchscreenSwipePart>,
 }
 
 impl MergeWith<GesturesPart> for Gestures {
@@ -24,6 +27,7 @@ impl MergeWith<GesturesPart> for Gestures {
             (self, part),
             dnd_edge_view_scroll,
             dnd_edge_workspace_switch,
+            touchscreen_swipe,
         );
         merge_clone!((self, part), hot_corners);
     }
@@ -109,4 +113,36 @@ pub struct HotCorners {
     pub bottom_left: bool,
     #[knuffel(child)]
     pub bottom_right: bool,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct TouchscreenSwipe {
+    pub off: bool,
+    pub fingers: u8,
+}
+
+impl Default for TouchscreenSwipe {
+    fn default() -> Self {
+        Self {
+            off: false,
+            fingers: 3,
+        }
+    }
+}
+
+#[derive(knuffel::Decode, Debug, Default, Clone, Copy, PartialEq)]
+pub struct TouchscreenSwipePart {
+    #[knuffel(child)]
+    pub off: bool,
+    #[knuffel(child, unwrap(argument))]
+    pub fingers: Option<u8>,
+}
+
+impl MergeWith<TouchscreenSwipePart> for TouchscreenSwipe {
+    fn merge_with(&mut self, part: &TouchscreenSwipePart) {
+        if part.off {
+            self.off = true;
+        }
+        merge_clone!((self, part), fingers);
+    }
 }

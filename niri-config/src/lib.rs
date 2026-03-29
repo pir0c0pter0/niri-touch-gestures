@@ -49,7 +49,7 @@ pub use crate::appearance::*;
 pub use crate::binds::*;
 pub use crate::debug::Debug;
 pub use crate::error::{ConfigIncludeError, ConfigParseResult};
-pub use crate::gestures::Gestures;
+pub use crate::gestures::{Gestures, TouchscreenSwipe};
 pub use crate::input::{Input, ModKey, ScrollMethod, TrackLayout, WarpMouseToFocusMode, Xkb};
 pub use crate::layer_rule::LayerRule;
 pub use crate::layout::*;
@@ -1633,6 +1633,10 @@ mod tests {
                     top_right: false,
                     bottom_left: false,
                     bottom_right: false,
+                },
+                touchscreen_swipe: TouchscreenSwipe {
+                    off: false,
+                    fingers: 3,
                 },
             },
             overview: Overview {

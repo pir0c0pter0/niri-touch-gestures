@@ -4234,7 +4234,14 @@ impl State {
             let timestamp = Duration::from_micros(evt.time());
             if let Some(gesture_ev) = self.niri.touch_swipe_tracker.touch_motion(slot, pos, timestamp) {
                 if let GestureEvent::Begin { .. } = &gesture_ev {
-                    if !handle.is_grabbed() {
+                    let ts_swipe_off = self
+                        .niri
+                        .config
+                        .borrow()
+                        .gestures
+                        .touchscreen_swipe
+                        .off;
+                    if !ts_swipe_off && !handle.is_grabbed() {
                         let dominated = self.niri.screenshot_ui.is_open()
                             || self.niri.window_mru_ui.is_open()
                             || self.niri.layout.is_overview_open();
