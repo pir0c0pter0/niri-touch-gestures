@@ -28,6 +28,11 @@ gestures {
         // bottom-left
         // bottom-right
     }
+
+    touchscreen-swipe {
+        fingers 3
+        // off
+    }
 }
 ```
 
@@ -113,3 +118,25 @@ gestures {
 ```
 
 You can also customize hot corners per-output [in the output config](./Configuration:-Outputs.md#hot-corners).
+
+### `touchscreen-swipe`
+
+Three-finger swipe gestures on a touchscreen, replicating the touchpad behavior:
+- Vertical swipe to switch workspaces (continuous carousel).
+- Horizontal swipe to move the view.
+
+The gesture uses the same continuous animation and inertia as the touchpad swipe.
+
+The options are:
+
+- `fingers`: number of fingers required to trigger the gesture (default: 3).
+- `off`: disable touchscreen swipe gestures entirely.
+
+```kdl
+gestures {
+    // Disable touchscreen swipe gestures.
+    touchscreen-swipe {
+        off
+    }
+}
+```
