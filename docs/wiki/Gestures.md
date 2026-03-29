@@ -66,6 +66,17 @@ Move the view horizontally with three-finger horizontal swipes.
 
 Open and close the overview with a four-finger vertical swipe.
 
+### Touchscreen
+
+#### Workspace Switch
+
+Switch workspaces with three-finger vertical swipes on the touchscreen.
+The gesture uses the same continuous carousel animation as the touchpad.
+
+#### Horizontal View Movement
+
+Move the view horizontally with three-finger horizontal swipes on the touchscreen.
+
 ### All Pointing Devices
 
 #### Drag-and-Drop Edge View Scroll
