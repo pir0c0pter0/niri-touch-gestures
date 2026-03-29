@@ -39,6 +39,8 @@ use smithay::wayland::keyboard_shortcuts_inhibit::KeyboardShortcutsInhibitor;
 use smithay::wayland::pointer_constraints::{with_pointer_constraint, PointerConstraint};
 use smithay::wayland::tablet_manager::{TabletDescriptor, TabletSeatTrait};
 use touch_overview_grab::TouchOverviewGrab;
+use touch_swipe_grab::TouchSwipeGrab;
+use touch_swipe_tracker::GestureEvent;
 
 use self::move_grab::MoveGrab;
 use self::resize_grab::ResizeGrab;
@@ -4065,6 +4067,9 @@ impl State {
         };
         let slot = evt.slot();
 
+        // Feed touchscreen swipe gesture tracker.
+        self.niri.touch_swipe_tracker.touch_down(slot, pos);
+
         let serial = SERIAL_COUNTER.next_serial();
 
         let under = self.niri.contents_under(pos);
@@ -4193,6 +4198,10 @@ impl State {
         };
         let slot = evt.slot();
 
+        // Feed touchscreen swipe gesture tracker.
+        let timestamp = Duration::from_micros(evt.time());
+        self.niri.touch_swipe_tracker.touch_up(slot, timestamp);
+
         if let Some(capture) = self.niri.screenshot_ui.pointer_up(Some(slot)) {
             if capture {
                 self.confirm_screenshot(true);
@@ -4219,6 +4228,38 @@ impl State {
             return;
         };
         let slot = evt.slot();
+
+        // Feed touchscreen swipe gesture tracker.
+        {
+            let timestamp = Duration::from_micros(evt.time());
+            if let Some(gesture_ev) = self.niri.touch_swipe_tracker.touch_motion(slot, pos, timestamp) {
+                if let GestureEvent::Begin { .. } = &gesture_ev {
+                    if !handle.is_grabbed() {
+                        let dominated = self.niri.screenshot_ui.is_open()
+                            || self.niri.window_mru_ui.is_open()
+                            || self.niri.layout.is_overview_open();
+                        if !dominated {
+                            if let Some(output) = self.niri.output_under_cursor() {
+                                // Take tracker, give to grab.
+                                let tracker = std::mem::replace(
+                                    &mut self.niri.touch_swipe_tracker,
+                                    crate::input::touch_swipe_tracker::TouchSwipeGestureTracker::new(),
+                                );
+                                let start_data = TouchGrabStartData {
+                                    focus: None,
+                                    slot,
+                                    location: pos,
+                                };
+                                let grab = TouchSwipeGrab::new(start_data, output, tracker);
+                                let serial = SERIAL_COUNTER.next_serial();
+                                handle.set_grab(self, grab, serial);
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         if let Some(output) = self.niri.screenshot_ui.selection_output().cloned() {
             let geom = self.niri.global_space.output_geometry(&output).unwrap();
