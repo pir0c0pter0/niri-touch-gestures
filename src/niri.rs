@@ -2518,7 +2518,7 @@ impl Niri {
             pointer_inside_hot_corner: false,
             tablet_cursor_location: None,
             gesture_swipe_3f_cumulative: None,
-            touch_swipe_tracker: crate::input::touch_swipe_tracker::TouchSwipeGestureTracker::new(),
+            touch_swipe_tracker: crate::input::touch_swipe_tracker::TouchSwipeGestureTracker::new(3),
             overview_scroll_swipe_gesture: ScrollSwipeGesture::new(),
             vertical_wheel_tracker: ScrollTracker::new(120),
             horizontal_wheel_tracker: ScrollTracker::new(120),
